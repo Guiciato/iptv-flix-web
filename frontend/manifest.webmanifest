@@ -1,0 +1,17 @@
+{
+  "name": "IPTV Flix Web",
+  "short_name": "IPTV Flix",
+  "description": "IPTV Flix Web/PWA para listas autorizadas.",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#050505",
+  "theme_color": "#ff7a00",
+  "icons": [
+    {
+      "src": "assets/logo.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

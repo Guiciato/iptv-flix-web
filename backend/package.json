@@ -1,0 +1,22 @@
+{
+  "name": "iptv-flix-backend",
+  "version": "1.1.0",
+  "description": "Backend Node/Express para IPTV Flix Web autorizado.",
+  "main": "server.js",
+  "license": "MIT",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "dependencies": {
+    "axios": "latest",
+    "compression": "latest",
+    "cors": "latest",
+    "dotenv": "latest",
+    "express": "latest",
+    "helmet": "latest"
+  },
+  "devDependencies": {
+    "nodemon": "latest"
+  }
+}

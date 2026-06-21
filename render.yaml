@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: iptv-flix-backend
+    env: node
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: npm start
+    plan: free
+    envVars:
+      - key: NODE_VERSION
+        value: 20
+      - key: API_PIN
+        sync: false
+      - key: FRONTEND_ORIGIN
+        sync: false

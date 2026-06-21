@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, viewport-fit=cover, initial-scale=1.0" />
+  <meta name="theme-color" content="#ff7a00" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="IPTV Flix" />
+  <title>IPTV Flix Web</title>
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <link rel="icon" href="./assets/logo.svg" />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div id="toast" class="toast hidden"></div>
+
+  <section id="loginScreen" class="login-screen">
+    <div class="login-card">
+      <div class="brand-row">
+        <img src="./assets/logo.svg" class="brand-logo" alt="IPTV Flix">
+        <div>
+          <h1>IPTV Flix Web</h1>
+          <p>Assista suas listas autorizadas no iPhone, Android e PC.</p>
+        </div>
+      </div>
+
+      <div class="login-tabs">
+        <button id="xtreamTab" class="active" type="button">Login Xtream</button>
+        <button id="m3uTab" type="button">Login por link</button>
+      </div>
+
+      <form id="xtreamForm" class="login-form">
+        <label>Backend Render/Railway
+          <input id="backendUrl" placeholder="https://seu-backend.onrender.com" required />
+        </label>
+
+        <label>PIN do backend, se tiver
+          <input id="apiPin" placeholder="Opcional" />
+        </label>
+
+        <label>Nome da lista
+          <input id="listName" placeholder="Ex: Minha lista IPTV" required />
+        </label>
+
+        <label>Usuário
+          <input id="username" placeholder="Usuário Xtream" autocomplete="username" required />
+        </label>
+
+        <label>Senha
+          <input id="password" placeholder="Senha Xtream" type="password" autocomplete="current-password" required />
+        </label>
+
+        <label>Servidor
+          <input id="server" placeholder="http://servidor.com:8080 ou https://servidor.com" required />
+        </label>
+
+        <label class="remember-row">
+          <input id="rememberXtream" type="checkbox" />
+          <span>Lembrar de mim neste navegador</span>
+        </label>
+
+        <button class="primary-btn" type="submit">Entrar</button>
+      </form>
+
+      <form id="m3uForm" class="login-form hidden">
+        <label>Backend Render/Railway
+          <input id="m3uBackendUrl" placeholder="https://seu-backend.onrender.com" required />
+        </label>
+
+        <label>PIN do backend, se tiver
+          <input id="m3uApiPin" placeholder="Opcional" />
+        </label>
+
+        <label>Nome da lista
+          <input id="m3uListName" placeholder="Ex: Minha lista M3U" required />
+        </label>
+
+        <label>Link M3U / M3U Plus
+          <input id="m3uUrl" placeholder="http://servidor.com/get.php?username=...&password=...&type=m3u_plus" required />
+        </label>
+
+        <label class="remember-row">
+          <input id="rememberM3U" type="checkbox" />
+          <span>Lembrar de mim neste navegador</span>
+        </label>
+
+        <button class="primary-btn" type="submit">Carregar link</button>
+      </form>
+
+      <p class="legal-note">
+        Use apenas conteúdo autorizado. O app não hospeda mídia, não quebra DRM e não libera conteúdo pago.
+      </p>
+    </div>
+  </section>
+
+  <main id="appScreen" class="app-screen hidden">
+    <aside class="sidebar">
+      <div class="mini-brand">
+        <img src="./assets/logo.svg" alt="IPTV Flix">
+        <span>IPTV Flix</span>
+      </div>
+
+      <button class="nav-btn active" data-section="live" type="button">📺 Canais</button>
+      <button class="nav-btn" data-section="vod" type="button">🎬 Filmes</button>
+      <button class="nav-btn" data-section="series" type="button">🍿 Séries</button>
+      <button class="nav-btn" data-section="favorites" type="button">⭐ Favoritos</button>
+
+      <div class="category-title">Categorias</div>
+      <div id="categoryList" class="category-list"></div>
+
+      <button id="logoutBtn" class="ghost-btn logout" type="button">Sair</button>
+    </aside>
+
+    <section class="content">
+      <header class="topbar">
+        <div>
+          <div id="currentListName" class="list-name">Lista</div>
+          <div id="accountStatus" class="account-status">Vencimento: —</div>
+        </div>
+
+        <div class="topbar-actions">
+          <label class="proxy-toggle" title="Use quando o navegador bloquear HTTP/CORS">
+            <input id="proxyMode" type="checkbox">
+            <span>Proxy</span>
+          </label>
+
+          <button id="refreshListBtn" class="refresh-btn" type="button">↻ Atualizar</button>
+
+          <div class="search-box">
+            <span>🔎</span>
+            <input id="searchInput" placeholder="Pesquisar..." />
+          </div>
+        </div>
+      </header>
+
+      <section id="hero" class="hero">
+        <div>
+          <p class="eyebrow">Web/PWA</p>
+          <h2>IPTV no navegador e no celular.</h2>
+          <p>Compatível com iPhone, Android e PC. Para melhor resultado, use listas HLS/M3U8 e HTTPS.</p>
+        </div>
+      </section>
+
+      <div id="loading" class="loading hidden">Carregando...</div>
+      <div id="emptyState" class="empty hidden">Nada encontrado.</div>
+      <section id="grid" class="grid"></section>
+
+      <section id="detailPanel" class="detail-panel hidden">
+        <button id="closeDetail" class="close-detail" type="button">×</button>
+        <div id="detailContent"></div>
+      </section>
+    </section>
+  </main>
+
+  <section id="playerOverlay" class="player-overlay hidden">
+    <div class="player-shell">
+      <button id="closePlayer" class="player-close" type="button">×</button>
+      <video id="videoPlayer" class="video-player" playsinline webkit-playsinline x-webkit-airplay="allow"></video>
+
+      <div class="player-gradient"></div>
+
+      <div class="player-controls">
+        <div>
+          <div id="playerTitle" class="player-title">Título</div>
+          <div id="playerMeta" class="player-meta">Pronto</div>
+        </div>
+
+        <div class="timeline-row">
+          <span id="currentTime">00:00</span>
+          <input id="timeline" type="range" min="0" max="100" value="0" />
+          <span id="durationTime">00:00</span>
+        </div>
+
+        <div class="control-row">
+          <button id="playPauseBtn" class="round-btn" type="button">▶</button>
+          <button id="muteBtn" class="round-btn" type="button">🔊</button>
+          <input id="volume" class="volume" type="range" min="0" max="1" value="1" step="0.01" />
+          <button id="favoritePlayerBtn" class="pill-btn" type="button">⭐ Favoritar</button>
+          <button id="webCastBtn" class="pill-btn" type="button">📡 Cast/AirPlay</button>
+          <button id="copyLinkBtn" class="pill-btn" type="button">📋 Copiar link</button>
+          <button id="openExternalBtn" class="pill-btn" type="button">🌐 Abrir</button>
+          <button id="fullscreenBtn" class="pill-btn" type="button">⛶ Tela cheia</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1"></script>
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+  <script src="./app.js"></script>
+</body>
+</html>
