@@ -1,4 +1,4 @@
-const CACHE_NAME = "iptv-flix-web-v1";
+const CACHE_NAME = "iptv-flix-web-v1.3";
 
 const STATIC_FILES = [
   "./",

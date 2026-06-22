@@ -72,3 +72,29 @@ Mudanças adicionadas:
 - O player agora usa `x-webkit-airplay="allow"`.
 
 Observação: iPhone/Safari não envia para Chromecast pelo Cast SDK como o Chrome/Android. No iPhone, o caminho nativo é AirPlay. Chromecast no navegador funciona melhor no Chrome/Android/PC.
+
+
+## Atualização 1.2
+
+Mudanças adicionadas:
+
+- Tela inicial simplificada.
+- Backend padrão configurado como `https://iptv-flix-web.onrender.com`.
+- Campos de Backend e PIN ficam dentro de `Configurações avançadas`.
+- PIN e URL do backend são salvos apenas no navegador/aparelho do usuário.
+- O PIN não fica fixo no código do GitHub por segurança.
+- Ao sair, os dados da lista são limpos, mas backend/PIN salvos no aparelho continuam preenchidos.
+
+
+## Atualização 1.3
+
+Melhorias adicionadas:
+
+- Player Web/PWA otimizado para celular.
+- Controles do player somem automaticamente após 5 segundos sem toque/movimento.
+- Ao tocar na tela, os controles voltam.
+- Botão de tela cheia melhorado:
+  - iPhone/Safari usa `webkitEnterFullscreen()` quando disponível.
+  - Android/Chrome/PC usa Fullscreen API.
+- Controles nativos do vídeo foram desativados para manter visual limpo e controle total.
+- Cache do PWA atualizado para `iptv-flix-web-v1.3`.

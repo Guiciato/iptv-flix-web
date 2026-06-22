@@ -51,6 +51,8 @@ const storageKeys = {
   settings: "iptvflixweb.settings"
 };
 
+const DEFAULT_BACKEND_URL = "https://iptv-flix-web.onrender.com";
+
 const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
 const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
 
@@ -152,7 +154,13 @@ function tryDecodeBase64(value) {
 }
 
 function apiBase() {
-  return normalizeBackend(state.session?.backendUrl || state.settings.backendUrl || els.backendUrl.value || els.m3uBackendUrl.value);
+  return normalizeBackend(
+    state.session?.backendUrl ||
+    state.settings.backendUrl ||
+    els.backendUrl.value ||
+    els.m3uBackendUrl.value ||
+    DEFAULT_BACKEND_URL
+  );
 }
 
 async function apiPost(path, body) {
@@ -771,7 +779,8 @@ function openPlayer(item, originalUrl) {
     hlsInstance = null;
   }
 
-  els.video.controls = isIOS;
+  // Usamos controles próprios para poder esconder no celular após 5 segundos.
+  els.video.controls = false;
   els.video.pause();
   els.video.removeAttribute("src");
   els.video.load();
@@ -820,7 +829,7 @@ function closePlayer() {
 }
 
 function resetPlayerIdleTimer() {
-  if (els.playerOverlay.classList.contains("hidden") || isIOS) return;
+  if (els.playerOverlay.classList.contains("hidden")) return;
 
   els.playerOverlay.classList.remove("controls-hidden");
   clearTimeout(playerIdleTimer);
@@ -829,7 +838,7 @@ function resetPlayerIdleTimer() {
     if (!els.playerOverlay.classList.contains("hidden") && !els.video.paused) {
       els.playerOverlay.classList.add("controls-hidden");
     }
-  }, 4000);
+  }, 5000);
 }
 
 async function refreshList() {
@@ -967,6 +976,7 @@ function clearLoginForms() {
   $("#m3uUrl").value = "";
   $("#rememberXtream").checked = false;
   $("#rememberM3U").checked = false;
+  applySavedAdvancedSettings();
 }
 
 function logout() {
@@ -981,11 +991,36 @@ function logout() {
   els.xtreamTab.click();
 }
 
+
+function syncAdvancedFields(source = "xtream") {
+  const backend = normalizeBackend(
+    source === "m3u" ? els.m3uBackendUrl.value : els.backendUrl.value
+  ) || DEFAULT_BACKEND_URL;
+
+  const pin = source === "m3u" ? els.m3uApiPin.value : els.apiPin.value;
+
+  els.backendUrl.value = backend;
+  els.m3uBackendUrl.value = backend;
+  els.apiPin.value = pin;
+  els.m3uApiPin.value = pin;
+
+  state.settings.backendUrl = backend;
+  state.settings.apiPin = pin || "";
+  saveJSON(storageKeys.settings, state.settings);
+}
+
+function applySavedAdvancedSettings() {
+  const backend = normalizeBackend(state.settings.backendUrl || DEFAULT_BACKEND_URL);
+  const pin = state.settings.apiPin || "";
+
+  els.backendUrl.value = backend;
+  els.m3uBackendUrl.value = backend;
+  els.apiPin.value = pin;
+  els.m3uApiPin.value = pin;
+}
+
 function bindEvents() {
-  els.backendUrl.value = state.settings.backendUrl || "http://localhost:3000";
-  els.m3uBackendUrl.value = state.settings.backendUrl || "http://localhost:3000";
-  els.apiPin.value = state.settings.apiPin || "";
-  els.m3uApiPin.value = state.settings.apiPin || "";
+  applySavedAdvancedSettings();
 
   els.xtreamTab.addEventListener("click", () => {
     els.xtreamTab.classList.add("active");
@@ -1001,11 +1036,17 @@ function bindEvents() {
     els.xtreamForm.classList.add("hidden");
   });
 
+  els.backendUrl.addEventListener("change", () => syncAdvancedFields("xtream"));
+  els.apiPin.addEventListener("change", () => syncAdvancedFields("xtream"));
+  els.m3uBackendUrl.addEventListener("change", () => syncAdvancedFields("m3u"));
+  els.m3uApiPin.addEventListener("change", () => syncAdvancedFields("m3u"));
+
   els.xtreamForm.addEventListener("submit", async (event) => {
     event.preventDefault();
     setLoading(true);
 
     try {
+      syncAdvancedFields("xtream");
       await loginWithXtream({
         backendUrl: $("#backendUrl").value,
         apiPin: $("#apiPin").value,
@@ -1027,6 +1068,7 @@ function bindEvents() {
     setLoading(true);
 
     try {
+      syncAdvancedFields("m3u");
       await loginWithM3U({
         backendUrl: $("#m3uBackendUrl").value,
         apiPin: $("#m3uApiPin").value,
@@ -1131,14 +1173,34 @@ function bindEvents() {
     if (state.currentMedia?.url) window.open(state.currentMedia.url, "_blank", "noopener");
   });
 
-  els.fullscreenBtn.addEventListener("click", () => {
-    const shell = document.querySelector(".player-shell");
-    if (!document.fullscreenElement) shell.requestFullscreen?.();
-    else document.exitFullscreen?.();
+  els.fullscreenBtn.addEventListener("click", async () => {
+    resetPlayerIdleTimer();
+
+    try {
+      // iPhone/Safari: fullscreen real do vídeo.
+      if (typeof els.video.webkitEnterFullscreen === "function") {
+        els.video.webkitEnterFullscreen();
+        return;
+      }
+
+      // Android/Chrome/PC: fullscreen da área do player.
+      const shell = document.querySelector(".player-shell");
+      if (!document.fullscreenElement) {
+        await shell.requestFullscreen?.();
+      } else {
+        await document.exitFullscreen?.();
+      }
+    } catch (_) {
+      showToast("Tela cheia não disponível neste navegador.");
+    }
   });
 
   els.playerOverlay.addEventListener("mousemove", resetPlayerIdleTimer);
+  els.playerOverlay.addEventListener("click", resetPlayerIdleTimer);
   els.playerOverlay.addEventListener("touchstart", resetPlayerIdleTimer, { passive: true });
+  els.playerOverlay.addEventListener("touchend", resetPlayerIdleTimer, { passive: true });
+  els.video.addEventListener("touchstart", resetPlayerIdleTimer, { passive: true });
+  els.video.addEventListener("click", resetPlayerIdleTimer);
 
   document.addEventListener("keydown", (event) => {
     if (!els.playerOverlay.classList.contains("hidden")) {

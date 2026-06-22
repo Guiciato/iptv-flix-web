@@ -30,13 +30,22 @@
       </div>
 
       <form id="xtreamForm" class="login-form">
-        <label>Backend Render/Railway
-          <input id="backendUrl" placeholder="https://seu-backend.onrender.com" required />
-        </label>
+        <details class="advanced-box">
+          <summary>⚙️ Configurações avançadas</summary>
+          <div class="advanced-content">
+            <label>Backend Render/Railway
+              <input id="backendUrl" placeholder="https://iptv-flix-web.onrender.com" required />
+            </label>
 
-        <label>PIN do backend, se tiver
-          <input id="apiPin" placeholder="Opcional" />
-        </label>
+            <label>PIN do backend, se tiver
+              <input id="apiPin" placeholder="Opcional" inputmode="numeric" />
+            </label>
+
+            <p class="advanced-note">
+              O backend já vem preenchido. O PIN fica salvo somente neste navegador/aparelho depois que você usar.
+            </p>
+          </div>
+        </details>
 
         <label>Nome da lista
           <input id="listName" placeholder="Ex: Minha lista IPTV" required />
@@ -63,13 +72,22 @@
       </form>
 
       <form id="m3uForm" class="login-form hidden">
-        <label>Backend Render/Railway
-          <input id="m3uBackendUrl" placeholder="https://seu-backend.onrender.com" required />
-        </label>
+        <details class="advanced-box">
+          <summary>⚙️ Configurações avançadas</summary>
+          <div class="advanced-content">
+            <label>Backend Render/Railway
+              <input id="m3uBackendUrl" placeholder="https://iptv-flix-web.onrender.com" required />
+            </label>
 
-        <label>PIN do backend, se tiver
-          <input id="m3uApiPin" placeholder="Opcional" />
-        </label>
+            <label>PIN do backend, se tiver
+              <input id="m3uApiPin" placeholder="Opcional" inputmode="numeric" />
+            </label>
+
+            <p class="advanced-note">
+              O backend já vem preenchido. O PIN fica salvo somente neste navegador/aparelho depois que você usar.
+            </p>
+          </div>
+        </details>
 
         <label>Nome da lista
           <input id="m3uListName" placeholder="Ex: Minha lista M3U" required />

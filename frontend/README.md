@@ -44,3 +44,21 @@ Compartilhar > Adicionar à Tela de Início
 - Chrome/Android/PC: tenta Chromecast com Google Cast Web Sender.
 - Safari/iPhone: tenta AirPlay quando disponível.
 - Se não houver suporte, o app copia o link do vídeo.
+
+
+## Atualização 1.2
+
+O frontend agora vem com o backend padrão `https://iptv-flix-web.onrender.com`.  
+Backend e PIN ficam em `Configurações avançadas`.
+
+Por segurança, o PIN não deve ser fixado no código público. Ele é salvo localmente no navegador após o primeiro uso.
+
+
+## Atualização 1.3
+
+Player mobile melhorado:
+
+- Controles somem após 5 segundos.
+- Toque na tela mostra os controles novamente.
+- Botão Tela cheia funciona melhor em iPhone/Safari e Android/Chrome.
+- Cache PWA atualizado.
